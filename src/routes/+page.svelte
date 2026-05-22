@@ -1,0 +1,219 @@
+<script lang="ts">
+	import type { PageData } from './$types';
+	import { invalidateAll, goto } from '$app/navigation';
+
+	let { data }: { data: PageData } = $props();
+
+	let filter = $state('');
+	let showOnlyMissing = $state(false);
+	let activeBucket = $state<string>('all');
+
+	const buckets = $derived(['all', ...data.groups.map((g) => g.name)]);
+
+	const filteredGroups = $derived.by(() => {
+		const q = filter.trim().toLowerCase();
+		return data.groups
+			.filter((g) => activeBucket === 'all' || g.name === activeBucket)
+			.map((g) => ({
+				name: g.name,
+				rows: g.rows.filter((r) => {
+					if (showOnlyMissing && r.hasTranscript) return false;
+					if (!q) return true;
+					return r.slug.toLowerCase().includes(q);
+				}),
+			}));
+	});
+
+	function formatDuration(sec: number): string {
+		if (!sec || sec <= 0) return '—';
+		const h = Math.floor(sec / 3600);
+		const m = Math.floor((sec % 3600) / 60);
+		const s = Math.floor(sec % 60);
+		if (h > 0) return `${h}h ${m}m`;
+		return `${m}m ${s}s`;
+	}
+
+	async function transcribe(bucket: string, slug: string) {
+		const res = await fetch('/api/jobs', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ kind: 'transcribe-one', bucket, slug }),
+		});
+		if (!res.ok) {
+			const { message } = await res.json().catch(() => ({ message: 'error' }));
+			alert(`Failed: ${message}`);
+			return;
+		}
+		const { id } = await res.json();
+		goto(`/transcribe?job=${id}`);
+	}
+
+	async function del(bucket: string, slug: string) {
+		if (
+			!confirm(
+				`Delete every file for\n\n  ${bucket}/${slug}\n\n(video, mp3, and transcript)?\nThis can't be undone.`,
+			)
+		)
+			return;
+		const res = await fetch(
+			`/api/library/${encodeURIComponent(bucket)}/${encodeURIComponent(slug)}`,
+			{ method: 'DELETE' },
+		);
+		if (!res.ok) {
+			const { message } = await res.json().catch(() => ({ message: 'error' }));
+			alert(`Failed: ${message}`);
+			return;
+		}
+		await invalidateAll();
+	}
+
+	const totalHours = $derived(data.totals.totalDurationSec / 3600);
+</script>
+
+<section class="hero">
+	<h1>
+		The <mark>Library</mark>.
+	</h1>
+	<p class="muted">
+		Every video, its <code>.mp3</code> audio, and word-level transcript &mdash; grouped by bucket.
+	</p>
+</section>
+
+<section class="stack">
+	<div class="row" style="gap: 3rem;">
+		<div>
+			<div class="caps muted">Buckets</div>
+			<div style="font-size: var(--fs-2); font-weight: 800; line-height: 1;">
+				{data.groups.length}
+			</div>
+		</div>
+		<div>
+			<div class="caps muted">Videos</div>
+			<div style="font-size: var(--fs-2); font-weight: 800; line-height: 1;">
+				{data.totals.videos}
+			</div>
+		</div>
+		<div>
+			<div class="caps muted">Transcribed</div>
+			<div style="font-size: var(--fs-2); font-weight: 800; line-height: 1;">
+				<mark>{data.totals.transcribed}</mark>
+			</div>
+		</div>
+		<div>
+			<div class="caps muted">Total words</div>
+			<div style="font-size: var(--fs-2); font-weight: 800; line-height: 1;">
+				{data.totals.totalWords.toLocaleString()}
+			</div>
+		</div>
+		<div>
+			<div class="caps muted">Total runtime</div>
+			<div style="font-size: var(--fs-2); font-weight: 800; line-height: 1;">
+				{totalHours.toFixed(1)}h
+			</div>
+		</div>
+	</div>
+</section>
+
+<section class="stack">
+	<div class="row" style="justify-content: space-between; gap: 1.5rem; flex-wrap: wrap;">
+		<div class="row" style="gap: 0.75rem; flex-wrap: wrap;">
+			{#each buckets as b (b)}
+				<button
+					type="button"
+					class="btn-small"
+					class:btn-primary={activeBucket === b}
+					class:btn-ghost={activeBucket !== b}
+					onclick={() => (activeBucket = b)}
+				>
+					{b}
+				</button>
+			{/each}
+		</div>
+		<div class="row" style="gap: 1rem;">
+			<input
+				type="search"
+				placeholder="FILTER BY SLUG..."
+				bind:value={filter}
+				style="max-width: 28rem;"
+			/>
+			<label class="field-check">
+				<input type="checkbox" bind:checked={showOnlyMissing} />
+				Only missing transcripts
+			</label>
+			<button class="btn-small" onclick={() => invalidateAll()}>Refresh</button>
+		</div>
+	</div>
+</section>
+
+{#each filteredGroups as group (group.name)}
+	<section class="stack">
+		<div class="row" style="justify-content: space-between;">
+			<h3>{group.name}</h3>
+			<span class="caps muted">{group.rows.length} shown</span>
+		</div>
+
+		<table>
+			<thead>
+				<tr>
+					<th>Slug</th>
+					<th>Video</th>
+					<th>MP3</th>
+					<th>Transcript</th>
+					<th>Words</th>
+					<th>Runtime</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				{#each group.rows as row (row.bucket + '::' + row.slug)}
+					<tr>
+						<td style="max-width: 38rem;">
+							<span style="font-weight: 600;">{row.slug}</span>
+						</td>
+						<td>
+							<span class="pip" class:pip-filled={row.hasVideo}></span>
+							{#if row.videoSizeMB !== null}
+								<span class="muted" style="margin-inline-start: 0.5rem; font-size: var(--fs-small);">
+									{row.videoSizeMB} MB
+								</span>
+							{/if}
+						</td>
+						<td>
+							<span class="pip" class:pip-filled={row.hasMp3}></span>
+							{#if row.mp3SizeMB !== null}
+								<span class="muted" style="margin-inline-start: 0.5rem; font-size: var(--fs-small);">
+									{row.mp3SizeMB} MB
+								</span>
+							{/if}
+						</td>
+						<td>
+							<span class="pip" class:pip-filled={row.hasTranscript}></span>
+						</td>
+						<td style="font-variant-numeric: tabular-nums;">
+							{row.transcriptWords?.toLocaleString() ?? '—'}
+						</td>
+						<td style="font-variant-numeric: tabular-nums;">
+							{formatDuration(row.transcriptDurationSec ?? 0)}
+						</td>
+					<td>
+						<div class="row" style="gap: 0.5rem; justify-content: flex-end;">
+							{#if !row.hasTranscript && (row.hasVideo || row.hasMp3)}
+								<button class="btn-small" onclick={() => transcribe(row.bucket, row.slug)}>
+									Transcribe
+								</button>
+							{/if}
+							<button
+								class="btn-small btn-ghost"
+								onclick={() => del(row.bucket, row.slug)}
+								title="Delete video, mp3, and transcript"
+							>
+								Delete
+							</button>
+						</div>
+					</td>
+					</tr>
+				{/each}
+			</tbody>
+		</table>
+	</section>
+{/each}

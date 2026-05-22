@@ -1,0 +1,531 @@
+/* ==========================================================================
+ * Supercut Studio — Design System
+ * ========================================================================== */
+
+:root {
+	--bg: #ffffff;
+	--ink: #0a0a0a;
+	--accent: #d0fe03;
+	--muted: #6b6b6b;
+	--rule: #0a0a0a;
+
+	--font-sans: 'Unbounded', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+	--font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+	--fs-1: clamp(3rem, 7vw, 6rem);
+	--fs-2: clamp(2rem, 4vw, 3.5rem);
+	--fs-3: 1.75rem;
+	--fs-4: 1.25rem;
+	--fs-body: 1rem;
+	--fs-small: 0.8125rem;
+
+	--lh-tight: 1;
+	--lh-snug: 1.15;
+	--lh-body: 1.55;
+
+	--tracking-tight: -0.02em;
+	--tracking-caps: 0.08em;
+
+	--gutter: clamp(1.5rem, 4vw, 4rem);
+	--stack: clamp(2rem, 4vw, 4rem);
+
+	color-scheme: light;
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	font: 400 var(--fs-body) / var(--lh-body) var(--font-sans);
+	color: var(--ink);
+	background: var(--bg);
+	min-height: 100vh;
+	-webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4 {
+	margin: 0;
+	font-family: var(--font-sans);
+	color: var(--ink);
+}
+
+h1 {
+	font-size: var(--fs-1);
+	line-height: var(--lh-tight);
+	letter-spacing: var(--tracking-tight);
+	font-weight: 800;
+	text-transform: uppercase;
+}
+
+h2 {
+	font-size: var(--fs-2);
+	line-height: var(--lh-tight);
+	letter-spacing: var(--tracking-tight);
+	font-weight: 800;
+	text-transform: uppercase;
+}
+
+h3 {
+	font-size: var(--fs-3);
+	line-height: var(--lh-snug);
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: var(--tracking-caps);
+}
+
+h4 {
+	font-size: var(--fs-4);
+	line-height: var(--lh-snug);
+	font-weight: 600;
+}
+
+p {
+	margin: 0;
+	max-width: 65ch;
+}
+
+a {
+	color: var(--ink);
+	text-decoration: underline;
+	text-decoration-thickness: 2px;
+	text-underline-offset: 3px;
+	text-decoration-color: var(--accent);
+}
+
+a:hover {
+	background: var(--accent);
+	text-decoration-color: var(--ink);
+}
+
+::selection {
+	background: var(--accent);
+	color: var(--ink);
+}
+
+/* Accent "spray-painted" highlight used in hero/titles. */
+mark,
+.mark {
+	background: var(--accent);
+	color: var(--ink);
+	padding-inline: 0.2em;
+	padding-block: 0.05em;
+	border-radius: 0;
+}
+
+/* --------------------------------------------------------------------------
+ * Layout primitives
+ * -------------------------------------------------------------------------- */
+
+.shell {
+	display: grid;
+	gap: var(--stack);
+	padding-inline: var(--gutter);
+	padding-block: var(--stack);
+	max-width: 1800px;
+	margin-inline: auto;
+}
+
+.rule {
+	display: block;
+	block-size: 1px;
+	border: 0;
+	background: var(--rule);
+	margin: 0;
+}
+
+.stack {
+	display: grid;
+	gap: 1.5rem;
+}
+
+.stack-tight {
+	display: grid;
+	gap: 0.75rem;
+}
+
+.row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1rem;
+	align-items: center;
+}
+
+/* --------------------------------------------------------------------------
+ * Header / nav
+ * -------------------------------------------------------------------------- */
+
+.topbar {
+	position: sticky;
+	top: 0;
+	z-index: 10;
+	background: var(--bg);
+	border-block-end: 1px solid var(--ink);
+	padding-inline: var(--gutter);
+	padding-block: 1.25rem;
+	display: flex;
+	align-items: center;
+	gap: clamp(1rem, 3vw, 3rem);
+}
+
+.wordmark {
+	font-size: 1.5rem;
+	font-weight: 800;
+	text-transform: uppercase;
+	letter-spacing: var(--tracking-tight);
+	text-decoration: none;
+	color: var(--ink);
+}
+
+.wordmark:hover {
+	background: transparent;
+}
+
+.wordmark > mark {
+	padding-inline: 0.25em;
+}
+
+.nav {
+	display: flex;
+	flex-wrap: wrap;
+	gap: clamp(0.75rem, 2vw, 1.75rem);
+	margin-inline-start: auto;
+	font-weight: 600;
+	font-size: 0.95rem;
+	text-transform: uppercase;
+	letter-spacing: var(--tracking-caps);
+}
+
+.nav a {
+	text-decoration: none;
+	padding-block: 0.15em;
+	color: var(--ink);
+}
+
+.nav a:hover {
+	background: transparent;
+	box-shadow: inset 0 -0.6em 0 var(--accent);
+}
+
+.nav a[aria-current='page'] {
+	box-shadow: inset 0 -0.6em 0 var(--accent);
+}
+
+/* --------------------------------------------------------------------------
+ * Forms & buttons
+ * -------------------------------------------------------------------------- */
+
+button,
+.btn {
+	font-family: var(--font-sans);
+	font-size: var(--fs-body);
+	font-weight: 600;
+	line-height: 1;
+	text-transform: uppercase;
+	letter-spacing: var(--tracking-caps);
+	padding: 0.95rem 1.4rem;
+	border: 0;
+	background: var(--ink);
+	color: var(--bg);
+	cursor: pointer;
+	display: inline-flex;
+	align-items: center;
+	gap: 0.6rem;
+	text-decoration: none;
+	transition:
+		background 120ms ease-out,
+		color 120ms ease-out;
+}
+
+button:hover:not(:disabled),
+.btn:hover:not(:disabled) {
+	background: var(--accent);
+	color: var(--ink);
+}
+
+button:disabled,
+.btn[aria-disabled='true'] {
+	opacity: 0.35;
+	cursor: not-allowed;
+}
+
+.btn-primary {
+	background: var(--accent);
+	color: var(--ink);
+}
+
+.btn-primary:hover:not(:disabled) {
+	background: var(--ink);
+	color: var(--accent);
+}
+
+.btn-ghost {
+	background: transparent;
+	color: var(--ink);
+	border: 1.5px solid var(--ink);
+	padding: calc(0.95rem - 1.5px) calc(1.4rem - 1.5px);
+}
+
+.btn-ghost:hover:not(:disabled) {
+	background: var(--ink);
+	color: var(--bg);
+}
+
+.btn-small {
+	padding: 0.5rem 0.85rem;
+	font-size: var(--fs-small);
+}
+
+label {
+	display: block;
+	font-size: var(--fs-small);
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: var(--tracking-caps);
+	margin-block-end: 0.4rem;
+}
+
+input[type='text'],
+input[type='search'],
+input[type='number'],
+textarea,
+select {
+	font-family: var(--font-sans);
+	font-size: var(--fs-body);
+	line-height: 1.3;
+	color: var(--ink);
+	background: var(--bg);
+	border: 1.5px solid var(--ink);
+	padding: 0.85rem 1rem;
+	width: 100%;
+	border-radius: 0;
+}
+
+textarea {
+	resize: vertical;
+	min-height: 5rem;
+	font-family: var(--font-mono);
+}
+
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+	outline: 3px solid var(--accent);
+	outline-offset: 2px;
+}
+
+input[type='checkbox'] {
+	accent-color: var(--accent);
+	inline-size: 1.1rem;
+	block-size: 1.1rem;
+}
+
+.field {
+	display: grid;
+	gap: 0.4rem;
+}
+
+.field-check {
+	display: flex;
+	align-items: center;
+	gap: 0.6rem;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: var(--tracking-caps);
+	font-size: var(--fs-small);
+	cursor: pointer;
+}
+
+.field-check input {
+	inline-size: auto;
+	width: auto;
+	margin: 0;
+}
+
+.help {
+	font-size: var(--fs-small);
+	color: var(--muted);
+}
+
+/* --------------------------------------------------------------------------
+ * Tables
+ * -------------------------------------------------------------------------- */
+
+table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 0.95rem;
+}
+
+th {
+	text-align: left;
+	font-weight: 800;
+	text-transform: uppercase;
+	letter-spacing: var(--tracking-caps);
+	font-size: var(--fs-small);
+	padding: 0.75rem 1rem 0.75rem 0;
+	border-block-end: 2px solid var(--ink);
+	white-space: nowrap;
+}
+
+td {
+	padding: 0.9rem 1rem 0.9rem 0;
+	border-block-end: 1px solid var(--ink);
+	vertical-align: middle;
+}
+
+tr:hover td {
+	background: var(--accent);
+}
+
+/* Status cells use small squares instead of coloured pills. */
+.pip {
+	display: inline-block;
+	inline-size: 0.9rem;
+	block-size: 0.9rem;
+	background: var(--bg);
+	border: 1.5px solid var(--ink);
+	vertical-align: -2px;
+}
+
+.pip-filled {
+	background: var(--accent);
+}
+
+/* --------------------------------------------------------------------------
+ * Monospace log surface (inverted colours — the only such surface)
+ * -------------------------------------------------------------------------- */
+
+.logs {
+	background: var(--ink);
+	color: var(--accent);
+	font-family: var(--font-mono);
+	font-size: 0.8125rem;
+	line-height: 1.5;
+	padding: 1.5rem;
+	max-height: 32rem;
+	overflow-y: auto;
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+
+.logs-empty {
+	color: color-mix(in oklab, var(--accent) 50%, var(--bg) 50%);
+	font-style: italic;
+}
+
+/* --------------------------------------------------------------------------
+ * Hero marker for home page
+ * -------------------------------------------------------------------------- */
+
+.hero h1 {
+	margin-block: 0;
+}
+
+/* --------------------------------------------------------------------------
+ * Two-column form / result panel layout used by creation pages.
+ * -------------------------------------------------------------------------- */
+
+.split {
+	display: grid;
+	gap: clamp(2rem, 4vw, 4rem);
+	grid-template-columns: 1fr;
+	align-items: start;
+}
+
+@media (min-width: 900px) {
+	.split {
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+	}
+}
+
+.panel-title {
+	margin-block-end: 1.5rem;
+}
+
+/* --------------------------------------------------------------------------
+ * Clip grid
+ * -------------------------------------------------------------------------- */
+
+.clip-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+	gap: 2rem;
+}
+
+.clip-tile {
+	display: grid;
+	gap: 0.75rem;
+	text-decoration: none;
+	color: var(--ink);
+}
+
+.clip-tile video {
+	inline-size: 100%;
+	aspect-ratio: 16 / 9;
+	object-fit: cover;
+	background: var(--ink);
+	display: block;
+}
+
+.clip-tile__name {
+	font-weight: 600;
+	font-size: 0.95rem;
+	line-height: 1.25;
+	word-break: break-word;
+	padding-block: 0.25rem;
+}
+
+.clip-tile:hover .clip-tile__name {
+	background: var(--accent);
+}
+
+.clip-tile__meta {
+	display: flex;
+	justify-content: space-between;
+	gap: 1rem;
+	font-size: var(--fs-small);
+	color: var(--muted);
+	text-transform: uppercase;
+	letter-spacing: var(--tracking-caps);
+}
+
+/* --------------------------------------------------------------------------
+ * Utility
+ * -------------------------------------------------------------------------- */
+
+.muted {
+	color: var(--muted);
+}
+
+.caps {
+	text-transform: uppercase;
+	letter-spacing: var(--tracking-caps);
+	font-weight: 600;
+	font-size: var(--fs-small);
+}
+
+.tag {
+	display: inline-block;
+	padding: 0.25rem 0.6rem;
+	background: var(--ink);
+	color: var(--bg);
+	font-family: var(--font-mono);
+	font-size: 0.75rem;
+}
+
+.tag-accent {
+	background: var(--accent);
+	color: var(--ink);
+}
