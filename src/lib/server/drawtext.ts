@@ -14,13 +14,15 @@ const FONT = process.env.DRAWTEXT_FONT ?? DEFAULT_FONT;
  * smaller size sized to the tile cell.
  */
 export function drawTextFilter(text: string, fontSize = 120): string {
-	// Filter strings are delimited by ':' and support escape sequences. Any
-	// colon, backslash, single quote or `%` inside the text needs escaping
-	// so ffmpeg doesn't parse it as syntax.
+	// ffmpeg quoting rules (av_get_token): inside '…' everything is literal
+	// with NO escape processing — a ' simply closes the quote. To embed a
+	// literal quote: close the current quote, emit \' (which is an escaped
+	// quote outside of quotes), then reopen: 'foo'\''bar' → foo'bar.
+	// Colons, backslashes and % still need escaping at the option-value level.
 	const esc = text
 		.replace(/\\/g, '\\\\')
 		.replace(/:/g, '\\:')
-		.replace(/'/g, "\\\\'")
+		.replace(/'/g, "'\\''")
 		.replace(/%/g, '\\%');
 	const parts = [
 		`fontfile=${FONT}`,
